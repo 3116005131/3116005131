@@ -14,7 +14,8 @@ namespace Word_Counter
             Console.Write("wc.exe ");
             string s = Console.ReadLine();
             string[] strs = s.Split(' ');
-            string path = '@'+strs[1];
+            string path = strs[1];
+            Console.WriteLine(path);
             int c = 0;
             int w = 0;
             int l = 0;
