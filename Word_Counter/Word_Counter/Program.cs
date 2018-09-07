@@ -12,12 +12,30 @@ namespace Word_Counter
         static void Main(string[] args)
         {
             string path = @"d:\text.dat";
-            FileStream fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write);
-            BinaryWriter writer = new BinaryWriter(fs);//其中，参数output 用于设置流对象，通常是由FileStream 类实例化的对象。
-            writer.BaseStream.Seek(0, SeekOrigin.Begin);
-            writer.Write("中华人民共和国");
-            writer.Close();
-            fs.Close();
+            FileStream fs = null;
+            BinaryReader reader = null;
+            try
+            {
+                fs = new FileStream(path, FileMode.Open);
+                reader = new BinaryReader(fs);
+                reader.BaseStream.Seek(0, SeekOrigin.Begin);
+                string s = reader.ReadString();
+                while (true)
+                {
+                    Console.WriteLine(s);
+                    s = reader.ReadString();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+            finally
+            {
+                if (reader != null) reader.Close();
+                if (fs != null) fs.Close();
+            }
+            Console.ReadLine();
         }
     }
 }
