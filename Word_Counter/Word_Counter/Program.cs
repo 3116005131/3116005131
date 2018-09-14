@@ -44,15 +44,16 @@ namespace Word_Counter
                     while (i!=-1)
                     {
                         c++;
-                        if (i<=90||i>=65||i>=97||i<=122)
+                        if ((i<=90&&i>=65)||(i>=97&&i<=122))
                         {
                             if (WFlag == 0)
                             {
                                 w++;
                                 WFlag = 1;
                             }
-                            else WFlag = 0;
+                           
                         }
+                        else WFlag = 0;
                         char character = (char)i;
                         if (character == '\n')
                         {
@@ -105,11 +106,16 @@ namespace Word_Counter
         }
         static void Main(string[] args)
         {
+            int i = 0;
             Console.WriteLine("The WorkCount version is 1.1.");
             Console.WriteLine("Only support inyput \" -c<path> , -w<path> , -l<path>\" for example: WC.exe -c c:test.c");
-            wc WorkCounter = new wc();
-            WorkCounter.NCount();
-            Console.ReadLine();
+            while(i!=6)
+            {
+                wc WorkCounter = new wc();
+                WorkCounter.NCount();
+                Console.ReadLine();
+                i++;
+            }
         }
     }
 }
