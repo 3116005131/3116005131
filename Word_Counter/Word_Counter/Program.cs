@@ -9,303 +9,107 @@ namespace Word_Counter
 {
     class Program
     {
-        public class WC
+        public class wc
         {
-            private string sFilename;    // 文件名
-            private string[] sParameter; // 参数数组  
-            private int iCharcount;      // 字符数
-            private int iWordcount;      // 单词数
-            private int iLinecount;      // 行  数
-            private int iNullLinecount;  // 空行数
-            private int iCodeLinecount;  // 代码行数
-            private int iNoteLinecount;  // 注释行数
-
-            // 初始化
-            public WC()
+            string path;    //需统计文件的路径
+            char[] types = { 'c', 'C', 'w', 'W', 'l', 'L' };    //目前所能统计的类型(字符，单词，行数）
+            int n;  //统计结果
+            char[] type;      //当前统计的类型
+            public void NCount()    //统计方法
             {
-                this.iCharcount = 0;
-                this.iWordcount = 0;
-                this.iLinecount = 0;
-                this.iNullLinecount = 0;
-                this.iCodeLinecount = 0;
-                this.iNoteLinecount = 0;
+                GetMessage();
+                Count();
+                Show();
             }
-            // 控制信息
-            public string Operator(string[] sParameter, string sFilename)
+            public void GetMessage()    //输入信息
             {
-                this.sParameter = sParameter;
-                this.sFilename = sFilename;
-
-                string retrun_str = "";
-
-                foreach (string s in sParameter)
-                {
-                    if (s == "-s")
-                    {
-                        try
-                        {
-                            string[] arrPaths = sFilename.Split('\\');
-                            int pathsLength = arrPaths.Length;
-                            string path = "";
-
-                            // 获取输入路径
-                            for (int i = 0; i < pathsLength - 1; i++)
-                            {
-                                arrPaths[i] = arrPaths[i] + '\\';
-
-                                path += arrPaths[i];
-                            }
-
-                            // 获取通配符
-                            string filename = arrPaths[pathsLength - 1];
-
-                            //  获取符合条件的文件名
-                            string[] files = Directory.GetFiles(path, filename);
-
-                            foreach (string file in files)
-                            {
-                                //Console.WriteLine("文件名：{0}", file);
-                                SuperCount(file);
-                                BaseCount(file);
-                                retrun_str = Display();
-                            }
-                            break;
-                        }
-                        catch (IOException )
-                        {
-                            //Console.WriteLine(ex.Message);
-                            return "";
-                        }
-                    }
-                    // 高级选项
-                    else if (s == "-a")
-                    {
-                        //Console.WriteLine("文件名：{0}", sFilename);
-                        SuperCount(sFilename);
-                        BaseCount(sFilename);
-                        retrun_str = Display();
-                        break;
-                    }
-                    //  基本功能
-                    else if (s == "-c" || s == "-w" || s == "-l")
-                    {
-                        //Console.WriteLine("文件名：{0}", sFilename);
-                        BaseCount(sFilename);
-                        retrun_str = Display();
-                        break;
-                    }
-                    else
-                    {
-                        //Console.WriteLine("参数 {0} 不存在", s);
-                        break;
-                    }
-                }
-                Console.WriteLine("{0}", retrun_str);
-                return retrun_str;
-            }
-
-            // 统计基本信息：字符数 单词数 行数
-            private void BaseCount(string filename)
+                Console.Write("WC.exe -");
+                string Message = Console.ReadLine();
+                string[] CategoryInfomation = Message.Split(' ');
+                path = CategoryInfomation[1];
+                type = CategoryInfomation[0].ToCharArray();
+            }   
+            public void Count()     //统计数量
             {
+                int c=0, w=0, l=0;//字符数，单词数，行数
+                int WFlag=0;        //单词标识符
+                FileStream fs = null;
+                StreamReader reader = null;
                 try
                 {
-                    // 打开文件
-                    FileStream file = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
-                    StreamReader sr = new StreamReader(file);
-                    int nChar;
-                    int charcount = 0;
-                    int wordcount = 0;
-                    int linecount = 0;
-                    //定义一个字符数组
-                    char[] symbol = { ' ', ',', '.', '?', '!', ':', ';', '\'', '\"', '\t', '{', '}', '(', ')', '+' ,'-',
-                  '*', '='};
-                    while ((nChar = sr.Read()) != -1)
+                    fs = new FileStream(path, FileMode.Open, FileAccess.Read);
+                    reader = new StreamReader(fs);
+                    reader.BaseStream.Seek(0, SeekOrigin.Begin);
+                    int i = reader.Read();
+                    while (i!=-1)
                     {
-                        charcount++;     // 统计字符数
-
-                        foreach (char c in symbol)
+                        c++;
+                        if (i<=90||i>=65||i>=97||i<=122)
                         {
-                            if (nChar == (int)c)
+                            if (WFlag == 0)
                             {
-                                wordcount++; // 统计单词数
+                                w++;
+                                WFlag = 1;
                             }
+                            else WFlag = 0;
                         }
-                        if (nChar == '\n')
+                        char character = (char)i;
+                        if (character == '\n')
                         {
-                            linecount++; // 统计行数
+                            l++;
                         }
+                        i = reader.Read();
                     }
-                    iCharcount = charcount;
-                    iWordcount = wordcount + 1;
-                    iLinecount = linecount + 1;
-                    sr.Close();
                 }
-                catch (IOException ex)
+                catch (Exception)        //path输入有误
                 {
-                    Console.WriteLine(ex.Message);
-                    return;
+                    Console.WriteLine("输入的地址有误，找不到该文件");
+                }
+                finally
+                {
+                    if(reader!=null)reader.Close();
+                    if(fs!=null)fs.Close();
+                }
+                if (type[0] == 'c' || type[0] == 'C')
+                {
+                    n = c;
+                }
+                else if (type[0] == 'w' || type[0] == 'W')
+                {
+                    n = w;
+                }
+                else if (type[0] == 'l' || type[0] == 'L')
+                {
+                    n = l;
                 }
             }
-
-            // 统计高级信息：空行数 代码行数 注释行数
-            private void SuperCount(string filename)
+            public void Show()      //输出结果
             {
-                try
+                if (type[0] == 'c' || type[0] == 'C')
                 {
-                    // 打开文件
-                    FileStream file = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
-                    StreamReader sr = new StreamReader(file);
-                    String line;
-                    int nulllinecount = 0;
-                    int codelinecount = 0;
-                    int notelinecount = 0;
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        line = line.Trim(' ');
-                        line = line.Trim('\t');
-                        //   空行
-                        if (line == "" || line.Length <= 1)
-                        {
-                            nulllinecount++;
-                        }
-                        //   注释行
-                        else if (line.Substring(0, 2) == "//" || line.Substring(1, 2) == "//")
-                        {
-                            notelinecount++;
-                        }
-                        // 代码行
-                        else
-                        {
-                            codelinecount++;
-                        }
-                    }
-                    iNullLinecount = nulllinecount;
-                    iCodeLinecount = codelinecount;
-                    iNoteLinecount = notelinecount;
-                    sr.Close();
+                    Console.WriteLine("字符数为{0}", n);
                 }
-                catch (IOException ex)
+                else if (type[0] == 'w' || type[0] == 'W')
                 {
-                    Console.WriteLine(ex.Message);
-                    return;
+                    Console.WriteLine("单词数为{0}", n);
                 }
-            }
-            // 打印信息
-            private string Display()
-            {
-                string return_str = "";
-
-                foreach (string s in sParameter)
+                else if(type[0] == 'l' || type[0] == 'L')
                 {
-                    if (s == "-c")
-                    {
-                        //Console.WriteLine("字 符 数：{0}", iCharcount);
-                        return_str += "字符数：" + iCharcount.ToString();
-                    }
-                    else if (s == "-w")
-                    {
-                        //Console.WriteLine("单 词 数：{0}", iWordcount);
-                        return_str += "单词数：" + iWordcount.ToString();
-                    }
-                    else if (s == "-l")
-                    {
-                        //Console.WriteLine("总 行 数：{0}", iLinecount);
-                        return_str += "总行数：" + iLinecount.ToString();
-                    }
-                    else if (s == "-a")
-                    {
-                        //Console.WriteLine("空 行 数：{0}", iNullLinecount);
-                        //Console.WriteLine("代码行数：{0}", iCodeLinecount);
-                        //Console.WriteLine("注释行数：{0}", iNoteLinecount);
-                        return_str += "空行数：" + iNullLinecount.ToString();
-                        return_str += "代码行数：" + iCodeLinecount.ToString();
-                        return_str += "注释行数：" + iNoteLinecount.ToString();
-                    }
+                    Console.WriteLine("行数为{0}", n);
                 }
-                //Console.WriteLine();
-                return return_str;
-            }
-            private string DisplayAll()
-            {
-                string return_str = "";
-                foreach (string s in sParameter)
+                else
                 {
-                    //Console.WriteLine("字 符 数：{0}", iCharcount);
-                    //Console.WriteLine("单 词 数：{0}", iWordcount);
-                    //Console.WriteLine("总 行 数：{0}", iLinecount);
-                    //Console.WriteLine("空 行 数：{0}", iNullLinecount);
-                    //Console.WriteLine("代码行数：{0}", iCodeLinecount);
-                    //Console.WriteLine("注释行数：{0}", iNoteLinecount);
-                    return_str += "字符数：" + iCharcount.ToString();
-                    return_str += "单词数：" + iWordcount.ToString();
-                    return_str += "总行数：" + iLinecount.ToString();
-                    return_str += "空行数：" + iNullLinecount.ToString();
-                    return_str += "代码行数：" + iCodeLinecount.ToString();
-                    return_str += "注释行数：" + iNoteLinecount.ToString();
+                    Console.WriteLine("Word count does not support this type of statistics.");     //输入的参数有误，n=0
                 }
-                //Console.WriteLine();
-                return return_str;
-            }
+            }           
         }
         static void Main(string[] args)
         {
-            /*Console.Write("wc.exe ");
-            string s = Console.ReadLine();
-            string[] strs = s.Split(' ');
-            string path = strs[1];
-            Console.WriteLine(path);
-            int c = 0;
-            int w = 0;
-            int l = 0;
-            char[] point = { ' ', '\t', '\n', '.', ',', '?', ':', ';', '_' };
-            FileStream fs = null;
-            StreamReader reader = null;
-            try
-            {
-                fs = new FileStream(path, FileMode.Open, FileAccess.Read);
-                reader = new StreamReader(fs);
-                int i = reader.Read();
-                while (i != -1)
-                {
-                    c++;
-                    char character = (char)i;
-                    if (character=='\n')
-                    {
-                        l++;
-                    }
-                    foreach (char p in point)
-                    {
-                        if (p==character)
-                        {
-                            w++;
-                        }
-                    }
-                    i = reader.Read();
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
-
-            finally
-            {
-                reader.Close();
-                fs.Close();
-            }
-            string str = strs[0];
-            if (str[1] == 'c')
-            {
-                Console.WriteLine("字符数为{0}", c);
-            }
-            else if (str[1] == 'w')
-            {
-                Console.WriteLine("单词数为{0}", w);
-            }
-            else
-                Console.WriteLine("行数为{0}", l);
-            Console.ReadLine();*/
-
+            Console.WriteLine("The WorkCount version is 1.1.");
+            Console.WriteLine("Only support inyput \" -c<path> , -w<path> , -l<path>\" for example: WC.exe -c c:test.c");
+            wc WorkCounter = new wc();
+            WorkCounter.NCount();
+            Console.ReadLine();
         }
     }
 }

@@ -7,11 +7,138 @@ using System.Threading.Tasks;
 
 namespace ConsoleApplication1
 {
+    public class Complex                       //虚数类
+    {
+        private double RP;
+        private double IP;
+        public double getRP() { return RP; }
+        public double getIP() { return IP; }
+        public Complex()
+        {
+            RP = IP = 0;
+        }
+        public Complex(double RP, double IP)
+        {
+            this.IP = IP;
+            this.RP = RP;
+        }
+        public static Complex operator +(Complex c1, Complex c2)
+        {
+            Complex c = new Complex(c1.RP + c2.RP, c1.IP + c2.IP);
+            return c;
+        }
+        public static Complex operator - (Complex c)
+        {
+            c.RP=-c.RP;
+            c.IP = -c.IP;
+            return c;
+        }
+        public static Complex operator - (Complex c1,Complex c2)
+        {
+            Complex c = new Complex(c1.RP - c2.RP, c1.IP - c2.IP);
+            return c;
+        }
+        public static implicit operator Complex(string s)
+        {
+            s = s.Trim().TrimEnd('i');
+            s = s.Trim().TrimEnd('*');
+            string[] digits = s.Split('+', '-');
+            Complex c = new Complex(Convert.ToDouble(digits[0]), Convert.ToDouble(digits[1]));
+            return c;
+        }
+        public void putIN()
+        {
+            Console.WriteLine("{0} + {1} *i", RP, IP);
+        }
+    }
     class Program
     {
+        interface I2
+        {
+            void g();
+        }
+        public class A:I2
+        {
+
+        }
+        class A
+        {
+            protected int a;
+            public virtual void show()
+            {
+                Console.WriteLine("这是类A中的办法，a = {0}", a);
+            }
+            public A(int a) { this.a = a; }
+        }
+        class B:A
+        {
+            private int b;
+            public override void show()
+            {
+                Console.WriteLine("这是类B中的方法，a={0},b={1}", a, b);
+            }
+            public B(int a,int b) : base(a) { this.b = b; }
+        }
+        static void Show(A obj)
+        {
+            obj.show();
+        }
+        class StaticC1
+        {
+            private string objName;
+            private int x;
+            private static int stx;
+            public void setx(int x)
+            {
+                this.x = x;
+            }
+            public static void setstx(int y)
+            {
+                stx = y;
+            }
+            public void show()
+            {
+                Console.WriteLine("对象{0}：x = {1},stx = {2}", this.objName, x, stx);
+            }
+            public StaticC1(string objName) { this.objName = objName;x = 0;stx = 0; }
+        }
         static void Main(string[] args)
         {
-            double x3;
+            A a = new A(10);
+            a.show();
+            B b = new B(100, 200);
+            b.show();
+            Console.WriteLine("--------------------------------");
+            Show(a);
+            Show(b);
+            Console.WriteLine("--------------------------------");
+            A aa = b;
+            Show(aa);
+            /*
+            StaticC1 c1 = new StaticC1("c1");
+            StaticC1 c2 = new StaticC1("c2");
+
+            c1.setx(1);
+            StaticC1.setstx(2);
+
+            c2.setx(3);
+            StaticC1.setstx(4);
+
+            c1.show();c2.show();
+            */
+            
+            Complex c1 = new Complex();
+            Complex c2 = new Complex(1, 2);
+            Console.Write("c1 = ");c1.putIN();
+            Console.Write("c2 = ");c2.putIN();
+            Complex c3;
+            c3 = "100+200*i";
+            Console.Write("c3 = ");c3.putIN();
+            Complex c4;
+            c4 = c2 - c1 + (-c3);
+            Console.Write("c4 = ");c4.putIN();
+            
+            /*double x3;
             int f3;
             Console.Write("x=");
             x3 = Convert.ToDouble(Console.ReadLine());
@@ -237,7 +364,7 @@ namespace ConsoleApplication1
             float c, f;
             f = float.Parse(s);
             c = 5 * (f - 32) / 9;
-            Console.WriteLine("华氏{0}度 = 摄氏{1}度", s, c);
+            Console.WriteLine("华氏{0}度 = 摄氏{1}度", s, c);*/
             Console.ReadLine();
         }
     }
