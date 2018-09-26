@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -366,25 +367,82 @@ namespace Myapp
             }
             public string createProblem(int range)
             {
-                Random r = new Random;
-                string s="";
-                string tempNum = null;
-                string tempOperator = null;
-                int operatorNum = r.Next(2, 4);
-                int bracket_left = 0;
-                int bracket_right = 0;
-                bracket_left = r.Next(1, 4);
+                Random r = new Random();            //随机数生成器
+                string s="";                        //string题目
+                string tempNum = null;              //string数
+                string tempOperator = null;         //string运算符
+                int operatorNum = r.Next(2, 4);     //运算符的个数
+                int bracket_left = 0;               //左括号
+                int bracket_right = 0;              //右括号
+                bracket_left = r.Next(1, 4);        //第一个字符是否为左括号 概率为1/4
                 if (bracket_left == 1)
                 {
                     s += "(";
                     bracket_right++;
                 }
-                s += "" + r.Next(range);
+                s += "" + r.Next(range);            //（4
                 for (int j = 0; j < operatorNum; j++)
                 {
-
+                    tempOperator = CreatArith();    //生成运算符
+                    if (tempOperator.Equals("/"))
+                    {
+                        tempNum = "" + (r.Next(range) + 1);
+                    }
+                    else
+                    {
+                        tempNum = "" + r.Next(range);
+                    }                               //生成计算数并保证分母不为0
+                    bracket_left = r.Next(3);       
+                    if (bracket_left == 1 && j != operatorNum - 1)
+                    {
+                        s += tempOperator;
+                        s += "(";
+                        s += tempNum;
+                        bracket_right++;            //（4/（3+（5-6）））
+                    }
+                    else if (bracket_left == 2 && bracket_right != 0 && j != 0)
+                    {
+                        s += ")";
+                        bracket_right--;
+                    }                               //
+                    s += tempOperator + tempNum;    //
                 }
+                if (bracket_right!=0)
+                {
+                    for (int i = 0; i < bracket_right; bracket_right--)
+                    {
+                        s += ")";
+                    }
+                }                                   
+                problem = s;
                 return s;
+            }
+            public List<string> productProblemList()
+            {
+                try
+                {
+                    problemList = new List<string>();//不知道为什么要用列表
+                    string path = @"d:\test.txt";
+                    FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write);
+                    BinaryWriter write = new BinaryWriter(fs);
+                    for (int i = 0; i < problemNum; i++)
+                    {
+                        string str1 = createProblem(range);//给范围生成一道题目
+                        TreeNode lastNode = null;
+                        BinaryTree tree = new BinaryTree();
+                        lastNode = tree.createTree(str1);
+                        TreeNode node = tree.getNode();
+                        GetExp exp = new GetExp();
+                        //初始化完成
+                        exp.getExpression(node);       //这里做了什么呢
+                    }
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+                return problemList;
             }
 
         }
@@ -468,12 +526,19 @@ namespace Myapp
             }
 
         }
-        public class Total
-        {
-
-        }
         static void Main(string[] args)
         {
+            Console.Write("Myapp.exe -");//Myapp.exe -n   10
+            int n=Convert.ToInt32(Console.ReadLine());
+            Console.Write("Myapp.exe -");//Myapp.exe -r   10
+            int r=Convert.ToInt32(Console.ReadLine());
+            Create cr = new Create();
+            cr.attProblemNum = n;
+            cr.attRange = r;
+            //完成输入工作得到n,r  准备生成题目
+            List<string> problemList = cr.productProblemList();
+            //在txt中生成好了题目
+
 
         }
     }
