@@ -413,9 +413,38 @@ namespace Myapp
                     {
                         s += ")";
                     }
-                }                                   
+                }                                   //
+                s = subStr(s);//针对特殊情况（4/3+2*1）
                 problem = s;
                 return s;
+            }
+            public string subStr(string str)
+            {
+                char[] s = str.ToCharArray();
+                if (s[0] == '('&&s[str.Length-1]==')')
+                {
+                    int left_no = 0;
+                    for (int i = 1; i < str.Length-1; i++)
+                    {
+                        if (s[i] == ')')
+                        {
+                            left_no++;
+                        }
+                        if (s[i]==')')
+                        {
+                            if (left_no > 0)
+                            {
+                                left_no--;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    str = str.Substring(1, str.Length - 1);
+                }
+                return str;
             }
             public List<string> productProblemList()
             {
@@ -428,13 +457,6 @@ namespace Myapp
                     for (int i = 0; i < problemNum; i++)
                     {
                         string str1 = createProblem(range);//给范围生成一道题目
-                        TreeNode lastNode = null;
-                        BinaryTree tree = new BinaryTree();
-                        lastNode = tree.createTree(str1);
-                        TreeNode node = tree.getNode();
-                        GetExp exp = new GetExp();
-                        //初始化完成
-                        exp.getExpression(node);       //这里做了什么呢
                     }
                 }
                 catch (Exception)
@@ -538,8 +560,17 @@ namespace Myapp
             //完成输入工作得到n,r  准备生成题目
             List<string> problemList = cr.productProblemList();
             //在txt中生成好了题目
+            Console.WriteLine("请到D:\test.txt完成题目");
+            List<TreeNode> treeList = new List<TreeNode>();
+            for (int i = 0; i < problemList.; i++)
+            {
+                TreeNode lastNode = null;
+                BinaryTree tree = new BinaryTree();
 
-
+                lastNode = tree.createTree(problemList.get(i));
+                TreeNode node = tree.getNode();
+                treeList.add(node);
+            }
         }
     }
 }
